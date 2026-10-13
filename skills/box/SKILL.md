@@ -105,7 +105,7 @@ The tool selection table above governs when to reach for the CLI or direct REST.
 
 #### Usage
 
-- Read `references/box-cli.md` for CLI-first auth, smoke-test commands, safe verification patterns, and serial-execution constraints.
+- Read `references/box-cli.md` for CLI-first auth, smoke-test commands, safe verification patterns, and concurrency precautions.
 
 ### REST API
 
@@ -154,7 +154,7 @@ Follow these steps in order when coding against Box.
 - Pace Box AI calls at least 1–2 seconds apart. For bulk classification, use the sample-first strategy in `references/bulk-operations.md`.
 - Avoid downloading file bodies or routing content through external AI pipelines when Box-native methods (Box AI, search, metadata, previews) can answer the question server-side.
 - Request only the fields the application actually needs, and persist returned Box IDs instead of reconstructing paths later.
-- Run Box CLI commands strictly one at a time — see `references/box-cli.md` for details. For bulk work, default to CLI and use REST only after MCP/CLI setup attempts fail or the user explicitly confirms REST fallback.
+- Run dependent CLI writes serially and serialize processes sharing an OAuth environment as a precaution — see `references/box-cli.md` for details. For bulk work, default to CLI and use REST only after MCP/CLI setup attempts fail or the user explicitly confirms REST fallback.
 - Make webhook and event consumers idempotent. Box delivery and retry paths can produce duplicates.
 - Keep AI retrieval narrow for search and Q&A tasks. Search and filter first, then retrieve only the files needed for the answer. This does not apply to Box AI classification — when classifying documents, Box AI should be tried first per the content-understanding guardrail above.
 - Do not use `box configure:environments:get --current` as a routine auth check — it can print sensitive environment details.

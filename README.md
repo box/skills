@@ -84,7 +84,7 @@ The skills follow the [Agent Skills Open Standard](https://agentskills.io/). Eac
 - `references/` - Optional skill-local detail for substantial conditional workflows
 - `scripts/` or `assets/` - Optional executable helpers or output templates
 
-`box-cli` intentionally starts as a single `SKILL.md`. It uses installed CLI help and current public Box documentation for changing command details rather than vendoring a command catalog.
+`box-cli` intentionally starts as a single `SKILL.md`. It uses installed CLI help and current public Box documentation for changing command details rather than vendoring a command catalog. A standalone installation uses its own CLI workflow; the general `box` skill's MCP/CLI/REST routing applies when that skill is also installed.
 
 ## Prerequisites
 

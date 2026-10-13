@@ -10,13 +10,13 @@ Use the installed Box CLI to complete and verify Box operations. This skill is s
 ## Operating workflow
 
 1. Identify the requested outcome, target, and actor. If the request leaves a risky target, recipient, role, impersonated user, or batch scope ambiguous, ask one focused question before running a command.
-2. Establish the active Box identity once per task:
+2. Confirm the intended CLI environment and acting user before the operation. If the user names an environment, inspect `box configure:environments:select --help` and select that environment before checking identity:
 
    ```bash
    box users:get me --json --fields id,name,login
    ```
 
-   Reuse the same environment and `--as-user` value throughout the operation and its verification. Never switch to a more privileged identity merely to bypass an error.
+   Include the intended `--as-user <USER_ID>` in the identity check when impersonation is authorized. `users:get me` confirms the acting user, not the environment name. Reuse the same environment and actor controls throughout the operation and its verification; repeat the check after any authorized environment or actor change. Never switch to a more privileged identity merely to bypass an error.
 3. Resolve human-readable names to stable Box IDs before mutation. If multiple items match, present the candidates and ask the user to choose.
 4. Prefer a dedicated CLI command. Add `--json` for machine-readable output and narrow `--fields` to the data needed for the task.
 5. Treat a mutation response as provisional. Read the returned item or affected collection with the same actor and verify the requested state.
@@ -24,7 +24,7 @@ Use the installed Box CLI to complete and verify Box operations. This skill is s
 
 ## Common patterns
 
-Use these known forms directly when they fit. Do not probe with `--help` first unless the installed command rejects the syntax.
+Record `box --version` once when using the CLI. Use these documented forms directly when they fit. Inspect command help when a command or option is unfamiliar, the installed version differs from the verified version below, or syntax is rejected. For writes, resolve uncertainty before executing; do not use a mutation to probe syntax.
 
 ```bash
 # Identify the actor
@@ -66,7 +66,7 @@ box login -d
 ```
 
 - `box login -d` uses the official Box CLI application for interactive content operations.
-- In a headless environment, use `box login --code` and have the user complete authorization themselves.
+- In a headless environment, have the user run `box login -d --code` in their own terminal for the official CLI app, or `box login --platform-app --code` for their custom app. `--code` is a boolean flag: the CLI displays an authorization URL, then prompts for the state and authorization code after the user authorizes in an external browser. Enter those values only at the local CLI prompts; this flow still requires interaction.
 - Use `box login --platform-app` when the user needs a custom OAuth application or scopes beyond the official CLI application.
 - For approved server automation with JWT or Client Credentials Grant, use the current `box configure:environments:add --help` flow and protect the configuration file outside source control.
 - Developer tokens are for short local tests. Do not embed tokens, client secrets, private keys, or authorization codes in commands, prompts, logs, fixtures, or repository files.
@@ -85,11 +85,11 @@ The request must explicitly authorize the exact scope before:
 
 If that authorization is absent, show the actor, target IDs, proposed role or change, and batch size, then ask for confirmation. Do not rely on CLI prompts because some destructive commands do not prompt.
 
-Prefer narrow operations. Run dependent writes serially. Preserve any returned ID and use it for verification rather than repeating a name-based search.
+Prefer narrow operations. Run dependent writes serially. As an operational precaution, serialize CLI processes sharing an OAuth environment to avoid overlapping token refreshes or environment changes. This is not a blanket limitation on all independent CLI commands. Preserve any returned ID and use it for verification rather than repeating a name-based search.
 
 ## Bulk operations and recovery
 
-Box CLI commands accept CSV or JSON input through `--bulk-file-path`. Before executing a batch:
+Use CSV or JSON input through `--bulk-file-path` only when the specific command supports that flag. Supported arguments, columns, and nested values depend on the command; consult its help and the official bulk examples rather than assuming one schema works for every command. Before executing a batch:
 
 1. Inspect the specific command's help so input columns match its arguments and flags.
 2. Validate a small representative subset when the operation is reversible and the user has authorized it.
@@ -135,4 +135,4 @@ Use these sources when installed help is insufficient:
 - [Box CLI command documentation](https://github.com/box/boxcli/tree/main/docs)
 - [Box Developer CLI guides](https://developer.box.com/guides/cli/)
 
-Last verified against the public Box CLI documentation on 2026-09-21.
+Examples and authentication flags checked on 2026-10-13 against the public Box CLI source and docs at commit `97e4351cb5e4a2077f37090bb5aca0ae2fe7020f` (package version `4.10.1`). This documents the verification baseline, not a minimum supported version.
