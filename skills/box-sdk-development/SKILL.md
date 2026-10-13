@@ -1,50 +1,36 @@
 ---
 name: box-sdk-development
-description: Build or debug application code with an official Box SDK, especially TypeScript/Node or Python. Use for authentication, file transfer, bulk jobs, rate limits, and SDK method correctness; not for one-off Box CLI or MCP content operations.
+description: Build or debug application code using an official Box SDK, especially Python or TypeScript/Node. Covers SDK call correctness, file transfer, bulk work, rate limits, and observability; not one-off CLI or MCP content operations.
 ---
 
 # Box SDK development
 
-Build working Box integrations that match the project's installed SDK and remain observable and efficient at production scale.
+## Before coding
 
-## Before writing code
+1. Inspect the installed SDK version and types, runtime, authentication, Box actor, existing client wrapper, and expected workload. Keep the project's SDK major version unless migration is required or requested.
+2. Choose where the client, token management, rate limiter, retry policy, and logging live. Trace existing request paths for duplicate calls or bypassed controls. For repeated operations, estimate calls, request rate, transfer size, and restart needs before choosing an approach.
+3. Verify every Box method's arguments, return type, pagination, and errors against the installed SDK and current Box docs. Python and Node SDK major versions have incompatible interfaces; do not copy calls across versions.
+4. Implement and run focused tests plus the project's type check or build. Verify permissions and transfer behavior with an authorized test account when available; compilation alone cannot prove them.
 
-1. Inspect the project language, SDK package and locked version, authentication flow, runtime (browser, server, worker), existing Box client or wrapper, and the requested data volume. Keep the project's supported SDK major version unless migration is requested or required.
-2. For **each Box operation used**, verify the exact method, argument order, request object fields, return type, pagination mode, and error shape against the installed SDK's types/source and the matching official SDK/API reference. Do not translate method signatures from another SDK version or language by memory. If documentation and installed types disagree, code to the installed version and explain the mismatch.
-3. Choose the architecture before implementation: intended Box actor and permissions, SDK client lifetime, where authentication, request limiting, retries, and observability live, and how data flows through the app. Trace an existing client wrapper for duplicate calls or paths that bypass shared controls; keep it when it supports the chosen design. For repeated operations, estimate API calls per item and page, request rate and total allocation, transfer size, restart behavior, and completion time. Ask only for missing product choices that materially change the design.
-4. Implement the smallest suitable design, then run the project's type checker or compile step and focused tests. Verify actual SDK calls with a mock, fixture, or authorized sandbox integration where practical. A successful compile alone does not prove permissions, content, or throughput.
+For collection-wide jobs, read [bulk operations](references/bulk-operations.md). For uploads or downloads, read [file transfer](references/file-transfer.md).
 
-For TypeScript/Node, read [TypeScript guidance](references/typescript.md). For Python, read [Python guidance](references/python.md). For bulk operations across a collection, read [bulk operations](references/bulk-operations.md). For downloads or uploads, read [file transfer](references/file-transfer.md). Apply the shared rules below on every path.
+## Design constraints
 
-## Design rules
+- Choose the API for the requested result: original bytes, a preview, metadata, or a listing. Use the file-content endpoint for original bytes and representations for previews; a listing is discovery, not a download. Request needed fields and paginate to the endpoint's actual end, using markers when supported for large or changing collections.
+- Prefer Box-side copy, move, or metadata operations when content stays in Box. Use events or webhooks with catch-up instead of repeated full scans when tracking changes.
+- Reuse the SDK client and token cache. Include authentication, discovery, retries, and verification in API-call budgets; custom application calls count toward enterprise allocation even without 429s.
+- Bound concurrent requests by actor and endpoint. Current Box SDKs retry 429s with `Retry-After`; check the installed version and keep one retry owner. For older SDKs or custom HTTP, use bounded backoff that honors `Retry-After`. Reconcile uncertain writes before retrying; diagnose 401/403 rather than repeating them unchanged.
+- Keep client secrets and service-account keys server-side. Use the intended actor and least privilege; never log credentials.
 
-- Choose the API for the requested **result**. Original bytes, a preview or representation, metadata, and a collection listing serve different purposes. When original bytes are required, use the file content download operation or a ZIP download when an archive is suitable; do not reconstruct the original from representation pages. When a preview is required, use the appropriate representation instead of downloading the original by default.
-- Treat listing as discovery, not transfer. Request only fields needed for the workflow, paginate every collection to its actual end, and use marker pagination when the endpoint supports it and the collection can exceed offset limits. Do not infer that one page, a high limit, or an empty page implies completion without checking the endpoint's pagination contract.
-- Prefer server-side operations, such as copy, move, metadata query, or search, when the goal stays in Box. Avoid downloading and re-uploading bytes to perform a Box-internal change. Use events or webhooks plus catch-up where repeated full scans would be wasteful.
-- Reuse the configured SDK client and its token cache rather than requesting a new access token per item. Count authentication and verification calls in the request budget; Box counts custom application calls toward enterprise API allocation even when they do not trigger 429s.
-- For bulk transfers of original files, evaluate ZIP download against individual streaming. ZIP can reduce request overhead, but its item/size limits, archive assembly, failure reporting, and downstream need for per-file handling can make bounded individual downloads the better choice. Partition and checkpoint work when the scale or duration warrants it.
-- A loop is not inherently wrong: many Box mutations have no single bulk SDK method. Make the loop a bounded job with pagination, concurrency control, checkpoints, and reconciliation. Never unleash an unbounded `Promise.all`, thread pool, or request loop.
-- Check the installed SDK's retry behavior before adding application retries. Current Box SDKs retry 429s with backoff and `Retry-After`; let that layer own those retries, and use a shared limiter to slow admission of new work when throttling is observed. For older SDKs or custom HTTP clients, implement one bounded retry layer that honors `Retry-After`. Handle other transient failures within that same retry budget. Retry ambiguous writes only after checking whether they succeeded; treat 401/403 and ordinary 400/404 as diagnosis, not retry targets.
-- Keep tokens and private keys in the platform's secret store or environment, choose least privilege and the intended Box actor, and never expose credentials, original file content, signed download URLs, or sensitive metadata in logs. A browser must not receive server credentials.
+## Observability
 
-## Observability is part of the feature
+Instrument the SDK client or wrapper once. Record successes and failures with operation, item ID, safe actor or tenant ID, status, Box request ID when available, duration, bytes when relevant, and job ID. Capture 429s and retry delay only if SDK hooks or transport instrumentation expose them; hidden retries are unknown, not zero. For bulk jobs, keep durable per-item outcomes and monitor throughput and calls against the plan. Surface throttling or unexpected usage during the run. Configure log volume and retention; omit content, credentials, and signed URLs.
 
-Instrument the Box client or existing wrapper once so every operation can emit structured results without scattering logging across call sites. Capture **successes and failures**: operation, Box item ID/type, actor or tenant identifier where safe, status/error code, Box request ID when available, duration, bytes transferred where relevant, and job/correlation ID. Capture attempt count, 429s, and retry delay from SDK hooks or transport instrumentation when exposed; do not report these as zero merely because internal SDK retries are hidden. For bulk jobs, persist per-item outcome and checkpoint state durably; emit aggregate counts, throughput, API calls against the planned budget, and estimated remaining work during execution. Make alerts or operator-visible warnings fire when throttling, retry time, or total usage rises beyond the plan, rather than relying on a later Box report. Keep log volume, retention, and sensitive fields configurable; avoid printing a line for every successful item to the console when a durable ledger and metrics provide the needed traceability.
+## Completion report
 
-## Completion report — every finished SDK task
+After every SDK task, briefly state what changed and what was verified; the material design choices and their reasons; and viable alternatives with their tradeoffs. For bulk work, include the call-budget assumptions. State any unverified behavior.
 
-Return a short report with:
+## Official sources
 
-1. **What changed:** feature or fix, files touched, and verification performed or remaining.
-2. **Design choices:** each material choice and its concrete reason, including the selected SDK/API operation, transfer method, pagination and batch strategy, retry/concurrency policy, and logging approach when relevant. State the expected API-call shape and scale assumptions for bulk work.
-3. **Other viable options:** concise alternatives with the condition under which each is preferable and its cost. Compare only approaches that can satisfy the requested result; explain when a different output format would require a different approach.
-
-Keep this report proportional to the task. Explain uncertainty or unverified behavior plainly; never claim a one-shot guarantee when the runtime or Box permissions were not verified.
-
-## Current official sources
-
-Use current docs for live SDK signatures, feature support, and limits:
-
-- [Box Node SDK](https://github.com/box/box-node-sdk) and [Box Python SDK](https://github.com/box/box-python-sdk)
-- [Box API reference](https://developer.box.com/reference/) and [rate limits](https://developer.box.com/guides/api-calls/permissions-and-errors/rate-limits/)
-- [Marker pagination](https://developer.box.com/guides/api-calls/pagination/marker-based/) and [ZIP download API](https://developer.box.com/reference/post-zip-downloads/)
+- [Node SDK](https://github.com/box/box-node-sdk), [Python SDK](https://github.com/box/box-python-sdk), and [Box API reference](https://developer.box.com/reference/)
+- [Rate limits](https://developer.box.com/guides/api-calls/permissions-and-errors/rate-limits/) and [marker pagination](https://developer.box.com/guides/api-calls/pagination/marker-based/)
