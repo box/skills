@@ -5,7 +5,7 @@ description: Use the official Box CLI for Box command-line operations, reproduci
 
 # Box CLI
 
-This skill can be installed without the general `box` skill. For explicit CLI requests, use this workflow without requiring MCP setup.
+Use the installed Box CLI to complete and verify Box operations.
 
 ## Operating workflow
 
