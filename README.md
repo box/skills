@@ -12,7 +12,8 @@ The skills in this repo follow the [Agent Skills](https://agentskills.io/) forma
 # Choose skills interactively
 npx skills add box/skills
 
-# Or install a focused skill independently
+# Or install the SDK development skill independently
+npx skills add box/skills --skill box-sdk-development
 npx skills add box/skills --skill box-cli
 npx skills add box/skills --skill box-mcp
 ```

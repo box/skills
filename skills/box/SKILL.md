@@ -111,6 +111,7 @@ The tool selection table above governs when to reach for the CLI or direct REST.
 Direct REST is the last-resort fallback per the tool selection table — only when MCP and CLI are both unavailable or declined.
 
 Building application code (SDK/REST endpoints, webhook handlers) the user ships is a separate case — that is code you write, not agent tooling. Prefer an official Box SDK when one already exists in the codebase or for the target language.
+For SDK application code, use the standalone `box-sdk-development` skill when installed; it covers version-specific calls, transfer choices, bulk jobs, retries, and observability.
 
 #### Confirmation and setup
 
