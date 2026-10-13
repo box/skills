@@ -19,7 +19,7 @@ Tool selection between MCP and CLI is handled in the main skill workflow — see
 - **Actor testing** — verify behavior as the current CLI actor or impersonate with `--as-user`.
 - **Debugging** — reproduce failures with exact actor, object ID, and endpoint.
 
-The CLI should be run strictly one command at a time (concurrent CLI invocations cause auth conflicts).
+Run dependent writes serially. As an operational precaution, serialize CLI processes sharing an OAuth environment to avoid overlapping token refreshes or environment changes. This is not a blanket limitation on all independent CLI commands.
 
 Use direct REST calls instead when:
 

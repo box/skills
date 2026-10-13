@@ -4,6 +4,14 @@ All notable changes to the Box Agent Skills (`box/skills`) are documented in thi
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and this project aims to follow [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Added
+
+- `box-integration-best-practices` — guidance for efficient, reliable Box API integrations and repeatable agent workflows, including bulk operations and 429 handling.
+- `box-cli` as an independently installable, single-file skill for verified Box CLI operations, automation, bulk recovery, and narrow REST fallback.
+- `box-mcp` as an independently installable, single-file skill for hosted Box MCP setup, tool discovery, verified operations, and permitted content analysis when Box AI is unavailable.
+
 ## [0.3.0] - 2026-06-30
 
 Restructured the plugin into a layered architecture with a foundation skill that routes to focused reference files and workflow skills. MCP capability content (previously planned as separate Layer 2 skills) was flattened into reference files within the foundation skill for better retrieval — no separate install step, no cross-skill prerequisite chaining, and lower total context usage since references load on demand.

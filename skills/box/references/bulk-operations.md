@@ -29,9 +29,9 @@ Use this reference when the task involves more than a handful of files or folder
 
 ## Constraints
 
-### Box CLI must run serially
+### CLI concurrency precautions
 
-**Always run CLI commands one at a time, waiting for each to complete before starting the next.** See `references/box-cli.md` for why concurrent CLI invocations fail.
+Run dependent writes serially. As an operational precaution, serialize CLI processes sharing an OAuth environment to avoid overlapping token refreshes or environment changes. See `references/box-cli.md` for details; independent CLI commands are not universally incompatible with concurrency.
 
 ### Box API rate limits
 
