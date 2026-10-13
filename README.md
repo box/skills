@@ -61,6 +61,14 @@ Skills are automatically available once installed. The agent will use them when 
 
 `Fix webhook signature verification`
 
+### Build efficient integrations
+
+The [Box integration best practices skill](skills/box-integration-best-practices/SKILL.md) helps agents build and review repeatable Box API integrations, apps, and agent workflows.
+
+`Review this Box sync worker for redundant API calls and 429 handling`
+
+`Implement a resumable bulk metadata update that respects Box rate limits`
+
 ## Skill Structure
 
 The Box skill follows the [Agent Skills Open Standard](https://agentskills.io/):
