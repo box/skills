@@ -12,8 +12,9 @@ The skills in this repo follow the [Agent Skills](https://agentskills.io/) forma
 # Choose skills interactively
 npx skills add box/skills
 
-# Or install the Box CLI skill independently
+# Or install a focused skill independently
 npx skills add box/skills --skill box-cli
+npx skills add box/skills --skill box-mcp
 ```
 
 Check out the latest and full list of skills [here](https://skills.sh/box/skills).
@@ -45,6 +46,7 @@ Try it with: `Use the Box Power to add Box file upload to this app.`
 |---|---|
 | `box` | General Box foundation and router |
 | `box-cli` | Reliable Box CLI operations, automation, bulk work, and recovery |
+| `box-mcp` | Hosted Box MCP setup, tool discovery, and verified operations |
 | `box-legal-workflows` | Shared legal workflow guidance |
 | `box-legal-workflows-intake` | Legal intake and onboarding |
 | `box-legal-workflows-contract` | Contract review and monitoring |
@@ -53,6 +55,14 @@ Try it with: `Use the Box Power to add Box file upload to this app.`
 ## Usage
 
 Skills are automatically available once installed. The agent will use them when relevant tasks are detected. Here are some example prompts:
+
+### Connect and operate through Box MCP
+
+`Connect this agent to Box using the hosted MCP server`
+
+`Find invoices in this Box folder using the available MCP tools`
+
+`Diagnose why Box AI tools are missing from this MCP connection`
 
 ### Implement Box content workflows
 
@@ -84,16 +94,19 @@ The skills follow the [Agent Skills Open Standard](https://agentskills.io/). Eac
 - `references/` - Optional skill-local detail for substantial conditional workflows
 - `scripts/` or `assets/` - Optional executable helpers or output templates
 
-`box-cli` contains its workflow in one `SKILL.md` and uses installed CLI help for command details. Explicit CLI requests use that workflow; other Box requests use the general `box` skill's tool selection when installed.
+`box-cli` and `box-mcp` each contain their workflow in one `SKILL.md`. Use `box-cli` for CLI requests and `box-mcp` for MCP setup or operations through a Box MCP connection. Command details come from installed CLI help; MCP capabilities and inputs come from runtime tool discovery.
 
 ## Prerequisites
 
+- **Box MCP connection** (for `box-mcp`) — Configure and authorize the connection using your [client's setup guide](https://docs.box.com/en/box-mcp/supported-ai-platforms). Installing the skill does not authenticate the client or enable admin-disabled tools.
 - **Box CLI** (optional) — Install from [developer.box.com/guides/cli](https://developer.box.com/guides/cli) for CLI-first verification.
 - **BOX_ACCESS_TOKEN** (optional) — For direct REST verification when Box CLI is unavailable.
 
 ## Quick Verification
 
-For explicit CLI requests, use Box CLI. Otherwise, prefer MCP, then CLI, then direct REST as a last-resort fallback.
+For MCP requests, discover the tools exposed by the connection and call `who_am_i` to verify the intended Box user. Verify mutations through that same connection; unavailable capabilities require diagnosis or a permitted alternative workflow.
+
+For explicit CLI requests, use Box CLI. For other Box requests, prefer MCP, then CLI, then direct REST as a last-resort fallback. The following examples verify CLI or REST access:
 
 ```bash
 # With Box CLI installed and authenticated:
