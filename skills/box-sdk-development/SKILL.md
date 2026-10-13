@@ -12,7 +12,7 @@ description: Build or debug application code using an official Box SDK, especial
 3. Verify every Box method's arguments, return type, pagination, and errors against the installed SDK and current Box docs. Python and Node SDK major versions have incompatible interfaces; do not copy calls across versions.
 4. Implement and run focused tests plus the project's type check or build. Verify permissions and transfer behavior with an authorized test account when available; compilation alone cannot prove them.
 
-For collection-wide jobs, read [bulk operations](references/bulk-operations.md). For uploads or downloads, read [file transfer](references/file-transfer.md).
+Read the relevant SDK reference: [Python](references/python.md) or [TypeScript/Node](references/typescript.md). For collection-wide jobs, read [bulk operations](references/bulk-operations.md). For uploads or downloads, read [file transfer](references/file-transfer.md).
 
 ## Design constraints
 
