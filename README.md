@@ -9,7 +9,12 @@ The skills in this repo follow the [Agent Skills](https://agentskills.io/) forma
 ### As an Agent Skill
 
 ```bash
+# Choose skills interactively
 npx skills add box/skills
+
+# Or install a focused skill independently
+npx skills add box/skills --skill box-cli
+npx skills add box/skills --skill box-mcp
 ```
 
 Check out the latest and full list of skills [here](https://skills.sh/box/skills).
@@ -35,9 +40,29 @@ Note that the Box MCP Server currently does not support Dynamic Client Registrat
 
 Try it with: `Use the Box Power to add Box file upload to this app.`
 
+## Available Skills
+
+| Skill | Purpose |
+|---|---|
+| `box` | General Box foundation and router |
+| `box-cli` | Reliable Box CLI operations, automation, bulk work, and recovery |
+| `box-mcp` | Hosted Box MCP setup, tool discovery, and verified operations |
+| `box-legal-workflows` | Shared legal workflow guidance |
+| `box-legal-workflows-intake` | Legal intake and onboarding |
+| `box-legal-workflows-contract` | Contract review and monitoring |
+| `box-legal-workflows-ma` | M&A virtual data rooms |
+
 ## Usage
 
 Skills are automatically available once installed. The agent will use them when relevant tasks are detected. Here are some example prompts:
+
+### Connect and operate through Box MCP
+
+`Connect this agent to Box using the hosted MCP server`
+
+`Find invoices in this Box folder using the available MCP tools`
+
+`Diagnose why Box AI tools are missing from this MCP connection`
 
 ### Implement Box content workflows
 
@@ -71,19 +96,25 @@ The [Box integration best practices skill](skills/box-integration-best-practices
 
 ## Skill Structure
 
-The Box skill follows the [Agent Skills Open Standard](https://agentskills.io/):
+The skills follow the [Agent Skills Open Standard](https://agentskills.io/). Each skill owns its instructions and can be installed independently.
 
-- `SKILL.md` - Skill manifest with frontmatter, routing table, workflow steps, and guardrails
-- `references/` - Individual reference files (auth, content workflows, MCP tool patterns, AI/retrieval, etc.)
+- `SKILL.md` - Required manifest and task guidance
+- `references/` - Optional skill-local detail for substantial conditional workflows
+- `scripts/` or `assets/` - Optional executable helpers or output templates
+
+`box-cli` and `box-mcp` each contain their workflow in one `SKILL.md`. Use `box-cli` for CLI requests and `box-mcp` for MCP setup or operations through a Box MCP connection. Command details come from installed CLI help; MCP capabilities and inputs come from runtime tool discovery.
 
 ## Prerequisites
 
+- **Box MCP connection** (for `box-mcp`) — Configure and authorize the connection using your [client's setup guide](https://docs.box.com/en/box-mcp/supported-ai-platforms). Installing the skill does not authenticate the client or enable admin-disabled tools.
 - **Box CLI** (optional) — Install from [developer.box.com/guides/cli](https://developer.box.com/guides/cli) for CLI-first verification.
 - **BOX_ACCESS_TOKEN** (optional) — For direct REST verification when Box CLI is unavailable.
 
 ## Quick Verification
 
-Preferred order for agent tooling is MCP first, Box CLI second, and direct REST only as a last-resort fallback.
+For MCP requests, discover the tools exposed by the connection and call `who_am_i` to verify the intended Box user. Verify mutations through that same connection; unavailable capabilities require diagnosis or a permitted alternative workflow.
+
+For explicit CLI requests, use Box CLI. For other Box requests, prefer MCP, then CLI, then direct REST as a last-resort fallback. The following examples verify CLI or REST access:
 
 ```bash
 # With Box CLI installed and authenticated:
@@ -97,7 +128,7 @@ curl -sS -H "Authorization: Bearer $BOX_ACCESS_TOKEN" -H "Accept: application/js
 
 ## Contributing
 
-Skills follow the [Agent Skills specification](https://agentskills.io). The Box skill is a directory with a `SKILL.md` file containing YAML frontmatter and markdown instructions, plus a `references/` directory for feature-specific deep dives.
+Skills follow the [Agent Skills specification](https://agentskills.io). Each skill is a directory with a `SKILL.md` file containing YAML frontmatter and markdown instructions, plus only the supporting resources its workflow requires.
 
 ## License
 
