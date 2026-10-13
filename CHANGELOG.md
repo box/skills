@@ -8,6 +8,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ### Added
 
+- `box-integration-best-practices` — guidance for efficient, reliable Box API integrations and repeatable agent workflows, including bulk operations and 429 handling.
 - `box-cli` as an independently installable, single-file skill for verified Box CLI operations, automation, bulk recovery, and narrow REST fallback.
 - `box-mcp` as an independently installable, single-file skill for hosted Box MCP setup, tool discovery, verified operations, and permitted content analysis when Box AI is unavailable.
 
