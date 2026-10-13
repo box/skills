@@ -5,8 +5,8 @@ description: >
   Box — authentication and MCP/CLI setup, choosing between MCP/CLI/REST,
   rate-limit and pacing guidance, troubleshooting Box errors
   (401/403/404/409/429), or working with Box MCP tools (files, search,
-  collaboration, AI, hubs, doc gen). Start here for any Box task even if the
-  user doesn't name a specific tool, then route to the right reference.
+  collaboration, AI, hubs, doc gen). Route general Box requests to the right
+  reference. For explicit CLI requests, use box-cli when installed.
 ---
 
 # Box
@@ -21,14 +21,13 @@ tool (MCP, CLI, or REST) and the right domain reference. Use it to:
 - Identify which reference file covers the user's domain.
 - Diagnose common Box errors (401/403/404/409/429, missing content, wrong actor).
 
-Always start here—even when the user does not name a specific tool—then route
-to the deeper reference.
+For explicit CLI requests, use `box-cli` when installed. Otherwise, use the tool selection and domain routing below.
 
 ## Route The Request
 
 ### Tool selection
 
-First confirm which resources you actually have access to and are able to access. After, use this table to pick the right tool for the operation:
+For requests that do not specify a tool, check availability and use this table:
 
 | Operation type | Prefer | Rationale |
 | --- | --- | --- |
@@ -39,7 +38,7 @@ First confirm which resources you actually have access to and are able to access
 | Last-resort fallback when MCP is unavailable and CLI is unavailable or not an option | Direct REST | Only after explicit user confirmation and REST auth setup guidance |
 | Building application code (SDK/REST endpoints, webhook handlers) | SDK or REST in code | Not agent tooling — write code the user ships |
 
-The table above is the single source of truth for tool selection — the sections below reference it rather than restate it. When tooling is unavailable, escalate in this order: guide the user through MCP setup first, then CLI setup, and only fall back to direct REST as a last resort after the user explicitly confirms REST fallback is acceptable.
+For explicit CLI requests, check CLI availability and follow CLI setup. For other requests, guide the user through MCP setup first, then CLI setup. Use direct REST only after the user explicitly confirms fallback is acceptable.
 
 ### Domain routing
 
@@ -94,7 +93,7 @@ The Box MCP capabilities are documented in focused reference files. Use the doma
 
 ## CLI / REST API
 
-The tool selection table above governs when to reach for the CLI or direct REST. Both rank below MCP: CLI for operations outside MCP's scope or that need compact, field-filtered output, and direct REST only as a last-resort fallback after explicit user confirmation.
+The tool selection table above governs when to reach for the CLI or direct REST. For requests that do not specify a tool, prefer MCP, then CLI, then direct REST as a last-resort fallback after explicit user confirmation.
 
 ### CLI
 
@@ -105,7 +104,7 @@ The tool selection table above governs when to reach for the CLI or direct REST.
 
 #### Usage
 
-- Read `references/box-cli.md` for CLI-first auth, smoke-test commands, safe verification patterns, and serial-execution constraints.
+- Read `references/box-cli.md` for CLI-first auth, smoke-test commands, safe verification patterns, and concurrency precautions.
 
 ### REST API
 
@@ -127,7 +126,7 @@ Building application code (SDK/REST endpoints, webhook handlers) the user ships 
 
 Follow these steps in order when coding against Box.
 
-0. Inventory available Box tooling using the availability checks in the **MCP** and **CLI / REST API** sections above: check MCP first (`who_am_i`, completing client-provided OAuth if needed), then CLI (`box users:get me --json`), and record which are available. When tooling is missing, follow the escalation order from **Route The Request** (MCP setup → CLI setup → REST after explicit confirmation). If the task is building application code (adding SDK endpoints, webhook handlers), tooling availability is secondary — proceed to step 1.
+0. For explicit CLI requests, check CLI availability and use `box-cli` when installed or `references/box-cli.md` otherwise. For other requests, inventory available Box tooling using the availability checks in the **MCP** and **CLI / REST API** sections above: check MCP first (`who_am_i`, completing client-provided OAuth if needed), then CLI (`box users:get me --json`), and record which are available. When tooling is missing, follow the escalation order from **Route The Request** (MCP setup → CLI setup → REST after explicit confirmation). If the task is building application code (adding SDK endpoints, webhook handlers), tooling availability is secondary — proceed to step 1.
 1. Inspect the repository for existing Box auth, SDK or HTTP client, env vars, webhook handlers, Box ID persistence, and tests.
 2. Determine the acting identity before choosing endpoints: connected user, enterprise service account, app user, or platform-provided token.
 3. Select the tool using the tool selection table and identify the domain reference using the domain routing table above.
@@ -154,7 +153,7 @@ Follow these steps in order when coding against Box.
 - Pace Box AI calls at least 1–2 seconds apart. For bulk classification, use the sample-first strategy in `references/bulk-operations.md`.
 - Avoid downloading file bodies or routing content through external AI pipelines when Box-native methods (Box AI, search, metadata, previews) can answer the question server-side.
 - Request only the fields the application actually needs, and persist returned Box IDs instead of reconstructing paths later.
-- Run Box CLI commands strictly one at a time — see `references/box-cli.md` for details. For bulk work, default to CLI and use REST only after MCP/CLI setup attempts fail or the user explicitly confirms REST fallback.
+- Run dependent CLI writes serially and serialize processes sharing an OAuth environment as a precaution — see `references/box-cli.md` for details. For bulk work, default to CLI and use REST only after MCP/CLI setup attempts fail or the user explicitly confirms REST fallback.
 - Make webhook and event consumers idempotent. Box delivery and retry paths can produce duplicates.
 - Keep AI retrieval narrow for search and Q&A tasks. Search and filter first, then retrieve only the files needed for the answer. This does not apply to Box AI classification — when classifying documents, Box AI should be tried first per the content-understanding guardrail above.
 - Do not use `box configure:environments:get --current` as a routine auth check — it can print sensitive environment details.

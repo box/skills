@@ -26,7 +26,7 @@ Before changing code, capture these facts:
 
 Most Box failures reduce to one of these mismatches: wrong actor, wrong object ID, wrong endpoint, or an access-control change that was never confirmed.
 
-When using Box CLI, run `box <command> --help` before the first invocation of any subcommand to confirm it exists in the installed version and to verify flag names, required arguments, and supported options.
+When using Box CLI, record `box --version`. Use documented commands directly when they match the installed version. Inspect `box <command> --help` when a command or option is unfamiliar, the installed version differs from the documented baseline, or syntax is rejected. For writes, resolve uncertainty before executing; do not use a mutation to probe syntax.
 
 ## 401 or 403
 
@@ -53,7 +53,7 @@ When using Box CLI, run `box <command> --help` before the first invocation of an
 - Missing backoff and retry handling
 - Excessive search or listing requests without pagination controls
 - Bulk operations (batch moves, folder creation, metadata writes) sending requests too quickly — read the `Retry-After` header and wait that many seconds before retrying
-- Parallel Box CLI invocations — the CLI must run serially; concurrent calls cause auth conflicts and can trigger rate limits faster than expected
+- Concurrent CLI processes sharing an OAuth environment can overlap token refreshes or environment changes; serialize them as an operational precaution. Excessive concurrency can also increase rate-limit pressure.
 - For bulk workflows, add a 200–500ms pause between serial operations and implement proper `Retry-After` backoff; see `references/bulk-operations.md`
 
 ## Webhook verification failures
