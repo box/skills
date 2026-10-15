@@ -7,7 +7,54 @@
       {
         "name": "box",
         "source": "./",
-        "description": "Box Plugin for Claude Code to help with Box Platform integrations including content workflows, shared links, webhooks, metadata, and Box AI retrieval."
+        "description": "Box Plugin for Claude Code to help with Box Platform integrations including content workflows, shared links, webhooks, metadata, and Box AI retrieval.",
+        "relevance": {
+          "topic": "Box",
+          "signals": {
+            "cli": ["box"],
+            "hosts": [
+              "api.box.com",
+              "upload.box.com",
+              "dl.boxcloud.com",
+              "account.box.com"
+            ],
+            "filesRead": ["**/.box/**"],
+            "manifestDeps": [
+              {
+                "file": "[/\\\\]package\\.json$",
+                "pattern": "\"(box-node-sdk|box-typescript-sdk-gen|@box/cli)\"\\s*:"
+              },
+              {
+                "file": "[/\\\\]requirements\\.txt$",
+                "pattern": "(^|\\n)\\s*(box-sdk-gen|boxsdk)"
+              },
+              {
+                "file": "[/\\\\]pyproject\\.toml$",
+                "pattern": "(box-sdk-gen|boxsdk)"
+              },
+              {
+                "file": "[/\\\\]pom\\.xml$",
+                "pattern": "box-java-sdk(?!-gen)"
+              },
+              {
+                "file": "[/\\\\]build\\.gradle(\\.kts)?$",
+                "pattern": "box-java-sdk(?!-gen)"
+              },
+              {
+                "file": "\\.csproj$",
+                "pattern": "Box\\.V2"
+              },
+              {
+                "file": "[/\\\\]Package\\.swift$",
+                "pattern": "box-ios-sdk"
+              },
+              {
+                "file": "[/\\\\]Podfile$",
+                "pattern": "BoxSDK"
+              }
+            ]
+          }
+        }
       }
     ]
   }
