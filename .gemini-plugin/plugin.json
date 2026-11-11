@@ -1,0 +1,30 @@
+{
+  "name": "box",
+  "displayName": "Box",
+  "version": "1.0.0",
+  "description": "Search and organize Box content, summarize documents, extract metadata with Box AI, and run legal and integration workflows.",
+  "author": {
+    "name": "Box",
+    "url": "https://www.box.com/"
+  },
+  "homepage": "https://developer.box.com/",
+  "repository": "https://github.com/box/skills",
+  "license": "MIT",
+  "keywords": [
+    "box",
+    "box-platform",
+    "box-ai",
+    "box-mcp",
+    "content-management",
+    "document-management",
+    "cloud-storage",
+    "file-management",
+    "collaboration"
+  ],
+  "logo": "assets/logo.svg",
+  "suggestedPrompts": [
+    "Find the latest vendor agreement in my Box files.",
+    "Compare the contracts in my Box folder and summarize their differences.",
+    "Find all files in Box related to the project kickoff and copy them into a new folder called Project Kickoff."
+  ]
+}
