@@ -57,6 +57,7 @@ This repository also includes plugin configuration for supported platforms. Use 
 | Codex | [Codex notes](.codex-plugin/README.md) |
 | Cursor | [Cursor installation and setup](.cursor-plugin/README.md) |
 | Claude Code | [Claude Code plugin metadata](.claude-plugin/README.md) |
+| Gemini | [Gemini plugin metadata](.gemini-plugin/README.md) |
 | Kiro | [Install as a Kiro Power](#kiro-power) |
 
 For Box connection instructions for other clients, including Claude Cowork, see the supported-platform guides above.

@@ -8,6 +8,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ### Added
 
+- Gemini plugin manifest at `.gemini-plugin/plugin.json`, alongside the Claude, Cursor, and Codex plugin folders. Skills stay in the shared root `skills/` directory.
 - `box-integration-best-practices` — guidance for efficient, reliable Box API integrations and repeatable agent workflows, including bulk operations and 429 handling.
 - `box-cli` as an independently installable, single-file skill for verified Box CLI operations, automation, bulk recovery, and narrow REST fallback.
 - `box-mcp` as an independently installable, single-file skill for hosted Box MCP setup, tool discovery, verified operations, and permitted content analysis when Box AI is unavailable.
