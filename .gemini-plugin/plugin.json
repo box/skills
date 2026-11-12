@@ -26,5 +26,17 @@
     "Find the latest vendor agreement in my Box files.",
     "Compare the contracts in my Box folder and summarize their differences.",
     "Find all files in Box related to the project kickoff and copy them into a new folder called Project Kickoff."
-  ]
+  ],
+  "skills": [
+    "./skills/box/SKILL.md",
+    "./skills/box-cli/SKILL.md",
+    "./skills/box-integration-best-practices/SKILL.md",
+    "./skills/box-legal-workflows/SKILL.md",
+    "./skills/box-legal-workflows-contract/SKILL.md",
+    "./skills/box-legal-workflows-intake/SKILL.md",
+    "./skills/box-legal-workflows-ma/SKILL.md",
+    "./skills/box-mcp/SKILL.md",
+    "./skills/box-sdk-development/SKILL.md"
+  ],
+  "mcpServers": "./mcp.json"
 }
